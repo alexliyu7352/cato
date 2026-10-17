@@ -12,7 +12,8 @@ def audit(path,quality=False):
         split_scenes.setdefault(split,set()).add(scene)
         origins[r['target_origin']]=origins.get(r['target_origin'],0)+1
         if quality:
-            if r['target_origin']=='synthetic_npr_smoke_only':raise RuntimeError('quality dataset includes a synthetic smoke target')
+            if r.get('usage_mode') == 'research' or r['target_origin'] != 'reviewed_teacher_output':
+                raise RuntimeError('quality dataset includes research or unreviewed target')
             if not r.get('teacher_model_id') or not r.get('rights_reference'):
                 raise RuntimeError('teacher provenance missing')
     if quality:

@@ -55,3 +55,11 @@ After 40 gradient steps on synthetic NPR labels:
 | Real high-resolution/fast-motion A/B | NOT run | after true quality dataset and asset pipeline |
 
 **Visual artifact**: `results/eval_40steps/comparison.png` and `results/demo/R0_engineering_demo.mp4` are labeled ENGINEERING SMOKE ONLY. Their game-like/blockout rendering is deliberately not intended as Japanese animated-film quality.
+
+## 2026-10-17 Follow-up — Google AI Pro / GitHub bridge
+
+- Verified official Google AI Pro benefit: 200 monthly Colab compute units (not guaranteed GPU hours), rolled out September 2026.
+- Added a Colab notebook to check NVIDIA GPU, run CPU-tested pipeline with CUDA, benchmark fp16 and persist results to Drive. **This notebook has not been executed on a Colab GPU**.
+- Added research-only teacher import mode that skips mandatory rights declaration/manual QA while preserving provenance, teacher ID, geometry, hashes and scene splits. Production QA gate still rejects research-only samples.
+- Added actual CUDA device/precision to the benchmark CLI. **No CUDA timing claimed until run on real hardware**.
+- Private repo creation is still pending: the connected GitHub tool provides writes to existing repos but no create-repo method, and available remote desktop VPS has no GitHub CLI credentials.

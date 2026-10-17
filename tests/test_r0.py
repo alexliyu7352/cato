@@ -80,3 +80,45 @@ def test_teacher_ingest_requires_rights(tmp_path):
         'outputs_can_train_independent_model':False}))
     review=tmp_path/'review.jsonl';review.write_text('{}\n')
     with pytest.raises(PermissionError):ingest(MANIFEST,tmp_path,rights,review,tmp_path/'out.jsonl')
+
+def test_research_teacher_ingest_allows_unlicensed_exploratory_pairs(tmp_path):
+    """Research imports keep provenance but do not require rights/QA approval."""
+    from shutil import copyfile
+    from r0.teacher_ingest import ingest
+    from r0.audit import audit
+    targets = tmp_path / 'targets'
+    targets.mkdir()
+    rows = load_manifest(MANIFEST)
+    for scene in ('forest', 'portrait', 'village'):
+        row = next(r for r in rows if r['scene'] == scene)
+        sample_id = f"{row['scene']}_{int(row['frame']):04d}"
+        copyfile(MANIFEST.parent / row['source'], targets / f'{sample_id}.png')
+    out = tmp_path / 'research' / 'manifest.jsonl'
+    ingest(MANIFEST, targets, None, None, out, mode='research', teacher_model_id='test-teacher')
+    imported = load_manifest(out)  # resolves original G-buffers despite manifest relocation
+    assert len(imported) == 3
+    assert {r['split'] for r in imported} == {'train', 'val', 'test'}
+    assert {r['target_origin'] for r in imported} == {'research_teacher_unreviewed'}
+    assert all(r['usage_mode'] == 'research' and r['teacher_model_id'] == 'test-teacher' for r in imported)
+    assert 'rights_reference' not in imported[0]
+    assert audit(out)['rows'] == 3
+    with pytest.raises(RuntimeError, match='research|production|unreviewed'):
+        audit(out, quality=True)
+
+
+def test_research_teacher_import_rejects_wrong_resolution(tmp_path):
+    from r0.teacher_ingest import ingest
+    targets = tmp_path / 'targets'
+    targets.mkdir()
+    for scene in ('forest', 'portrait', 'village'):
+        Image.new('RGB', (64, 64), (20, 30, 40)).save(targets / f'{scene}_0000.png')
+    with pytest.raises(RuntimeError, match='zero accepted'):
+        ingest(MANIFEST, targets, None, None, tmp_path / 'manifest.jsonl', mode='research')
+
+def test_benchmark_records_device_and_timing():
+    from r0.benchmark import benchmark
+    result = benchmark(route='B', base=16, size=(32, 32), reps=1, threads=2, device='cpu')
+    assert result['device'] == 'cpu'
+    assert result['latency_median_ms'] >= 0
+    assert result['cpu_median_ms'] == result['latency_median_ms']
+    assert result['peak_cuda_memory_mib'] is None
