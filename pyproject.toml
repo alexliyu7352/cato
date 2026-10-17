@@ -1,0 +1,10 @@
+[project]
+name = "anime-r0-gbuffer-students"
+version = "0.1.0"
+description = "CPU validated R0 technical scaffold for a single-style 3D-to-anime neural renderer"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.2", "numpy>=1.24", "pillow>=10", "opencv-python-headless>=4.8"]
+[project.optional-dependencies]
+smoke = ["vtk>=9.3", "pytest>=8"]
+[tool.pytest.ini_options]
+testpaths=["tests"]

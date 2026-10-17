@@ -1,0 +1,6 @@
+{
+  "teacher_model_id": "FILL IN exact model and revision",
+  "rights_reference": "FILL IN license URL and output-to-student training permission",
+  "outputs_can_train_independent_model": false,
+  "legal_review_note": "Do not flip to true without verifying upstream foundation-model and adapter terms."
+}
