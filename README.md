@@ -73,8 +73,12 @@ python -m r0.audit --manifest datasets/teacher_train/manifest.jsonl --quality
 
 ## 2026-10-17 補充：Google AI Pro Colab 與研究模式
 
-已加入 `notebooks/R0_Colab_GPU_Validation.ipynb`，支援：GPU preflight、GitHub 私有倉庫（需 Colab Secret）或 ZIP 上傳、驗證測試、GPU A/B 訓練、CUDA FP16 延遲基準及 Google Drive checkpoint 封存。詳細 GPU 條件與執行步驟請見 `notes/R0_COLAB_GPU_RUNBOOK.md`。
+已加入 `notebooks/R0_Colab_GPU_Validation.ipynb`，支援：GPU preflight、公開 GitHub 倉庫 `alexliyu7352/cato`（無需 Token）或 ZIP 上傳、驗證測試、GPU A/B 訓練、CUDA FP16 延遲基準及 Google Drive checkpoint 封存。詳細 GPU 條件與執行步驟請見 `notes/R0_COLAB_GPU_RUNBOOK.md`。
 
 **研究期**可用 `python -m r0.teacher_ingest --mode research --original ... --targets ... --teacher-id ... --out ...` 匯入未經正式權利／人工 QA 審核的教師圖片。這些樣本標記為 `research_teacher_unreviewed`，不會通過 `r0.audit --quality` 生產級檢查。正式模式仍需 `--rights` 與 `--review`。
 
 `assets/r0_smoke_fixture.zip` 保存了舊版 12 個 3D 工程 fixture（不是手繪效果）。Git clone 後可解壓到專案根目錄，以取得測試所需的 `samples/smoke/`。大型訓練結果和模型權重沒有納入 Git。
+
+## 版本庫
+
+本專案使用 `https://github.com/alexliyu7352/cato` 保存程式、測試與工程 fixture；訓練權重及大型教師資料不納入 Git。對 Colab，將 `SOURCE_MODE` 設為 `github` 可直接讀取公開 `main` 原始碼，或使用 `upload` 匯入原型 ZIP。倉庫若變更為 Private，請重新配置唯讀下載途徑。

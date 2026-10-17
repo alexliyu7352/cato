@@ -16,7 +16,9 @@ def test_colab_notebook_source_parses():
         ast.parse(''.join(cell['source']))
     joined = '\n'.join(''.join(cell['source']) for cell in codes)
     assert 'torch.cuda.is_available()' in joined
-    assert "SOURCE_MODE = 'upload'" in joined
+    assert "SOURCE_MODE = 'github'" in joined
+    assert "GITHUB_REPO = 'alexliyu7352/cato'" in joined
+    assert "userdata.get('GH_PAT')" not in joined
     assert "--device', 'cuda'" in joined
 
 

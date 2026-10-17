@@ -28,8 +28,8 @@ Google 官方在 2026-09-22 宣布 Google AI 方案包含進階 Colab 福利；G
 
 1. 在 Colab 選擇 **Runtime > Change runtime type > GPU**。首次用 T4 型號或能取得的同級卡即可。
 2. `File > Upload notebook` 匯入 `notebooks/R0_Colab_GPU_Validation.ipynb`。
-3. 尚未建立 GitHub Repo 時使用 Notebook 預設 `SOURCE_MODE='upload'`，上傳本交付包 `Anime_Neural_Renderer_R0_Colab_Bundle_20261017.zip`。
-4. 當 GitHub 私有 Repo 建立並推送後，可設 `SOURCE_MODE='github'`。在 Colab Secret 加入只讀範圍的 `GH_PAT`，不要把 token 寫在 notebook 的 code cell 或輸出中。
+3. 公開倉庫 `alexliyu7352/cato` 完成程式提交後，Notebook 預設 `SOURCE_MODE='github'`，會直接下載 `main`，不需要 PAT。如程式尚未推送，改成 `SOURCE_MODE='upload'`，並上傳原型 ZIP。
+4. 對公開倉庫，Colab 不必設定 GitHub Secret。不要在 Notebook 內填寫存取憑證；若未來改為 Private，須採用另外驗證的唯讀認證方式。
 5. 順序執行 Notebook：GPU 資訊 → 安裝／測試 → 50-step A/B smoke → fp16 GPU benchmark → 保存 checkpoint 和 JSON 到 Google Drive。
 6. 如果已有真的教師 target（以來源影格名字命名），設定 Notebook `TEACHER_TARGETS` 與 `TEACHER_MODEL_ID` 後，使用 research mode 產生臨時配對 Manifest；正式品質測試仍需清理/評估。
 
@@ -48,22 +48,15 @@ python -m r0.audit --manifest datasets/teacher_research/manifest.jsonl
 
 此模式會將每筆資料標註為 `research_teacher_unreviewed`，**不等於已經通過藝術品質或正式生產審查**。正式模式仍維持原本嚴格的 rights + review 檢查。研究樣本需至少三個獨立場景群組，會依場景切分訓練/驗證/測試，但真正的資產組隔離仍需在擴大資料集時實作。
 
-## GitHub 保存狀態
+## GitHub 倉庫與授權狀態（2026-10-17）
 
-本地 Git 存在初始 `268bd36` commit 與後續 R0 Colab/GPU 配置 commit。GitHub connector 能讀取使用者 `alexliyu7352` 的已安裝倉庫，能對已存在的 repo 寫入 commit，**但未提供建立 repository 的 action**。已檢查遠端桌面連線的 VPS，也沒有 `gh` 已登入憑證。不能宣稱已推送到 GitHub。
+使用者已建立 `https://github.com/alexliyu7352/cato`，倉庫目前為 **Public**。GitHub App 安裝 `151265400` 採用選定倉庫（selected repositories）授權；截至本次驗證，授權清單尚未包括 `cato`，因此 GitHub API 寫入回傳 `403 Resource not accessible by integration`。此時不能宣稱已推送成功。
 
-暫定新私人倉庫名稱 `alexliyu7352/anime-neural-renderer`。若需使用者完成最小一步： https://github.com/new 建立同名 Private Repo（空倉庫、不勾選初始化 README/LICENSE/.gitignore），即可直接將本地 Git bundle / 專案包導入並推送；連接器也能在 Repo 存在後繼續提交新版本。
+使用者可到 https://github.com/settings/installations/151265400 → Configure → Repository access，將 `cato` 加入選定倉庫。完成後即可透過已連線 GitHub Connector 提交，不需要提供個人 Token。
 
-在 GitHub 新建後，具備此工作區的 `git` 指令：
+本地 Git 工作區保留原始 2 個 R0 Commit，新增遷移設定調整。已設定 `origin` 指向 `https://github.com/alexliyu7352/cato.git`，但遠端是否收到任一 Commit，必須另外以 GitHub API 確認。
 
-```bash
-cd anime_renderer_r0
-git remote add origin https://github.com/alexliyu7352/anime-neural-renderer.git
-git branch -M main
-git push -u origin main
-```
-
-**不要**把模型權重、大型訓練資料或 Colab 密鑰推送到 Git。`.gitignore` 已忽略結果目錄、權重；Checkpoint 存 Google Drive，Git 保存程式／配置／報告／小型固定測試素材。
+公開倉庫只保存程式、可重現的測試素材與文檔；不儲存模型訓練大資料、API 金鑰或憑證。如果未來改為私有，Colab 公開下載模式需要另外加上驗證的讀取權限。
 
 ## R0 成功定義
 
